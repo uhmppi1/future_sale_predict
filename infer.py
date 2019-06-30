@@ -6,7 +6,7 @@ rcParams['figure.figsize'] = 15, 6
 
 def infer_testset(model, X_test, y_test):
     y_hats = []
-    test_size = X_test[0].shape[0]   # X1_test의 길이
+    test_size = X_test[0].shape[0] # X1_test의 길이
     for i in range(test_size):
         x_input = [np.expand_dims(X_test[j][i], axis=0) for j in range(len(X_test))]
         cur_y_hat = model.predict(x_input, verbose=0)
@@ -15,3 +15,12 @@ def infer_testset(model, X_test, y_test):
         y_hats.append(cur_y_hat)
 
     return y_hats
+
+
+def print_result(y_hats, y_test):
+    y_hats = np.array(y_hats)
+    y_test = np.array(y_test)
+    rmse = np.sqrt(sum((y_hats - y_test) ** 2) / len(y_test))
+    print('=========================')
+    print('RMSE: %.4f' % rmse)
+    print('=========================')

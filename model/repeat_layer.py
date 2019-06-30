@@ -15,3 +15,8 @@ class RepeatEmbedding(Layer):
 
     def compute_output_shape(self, input_shape):
         return (input_shape[0], self.repeat_count, input_shape[2])
+
+    def get_config(self):
+        config = {'repeat_count': self.repeat_count}
+        base_config = super(RepeatEmbedding, self).get_config()
+        return dict(list(base_config.items()) + list(config.items()))
