@@ -8,7 +8,6 @@ data_pickle_file_path = 'dataset/pickle/dataset_12step_shop_cate.pkl'
 
 seed(1)
 from tensorflow import set_random_seed
-
 set_random_seed(2)
 
 if __name__ == "__main__":
@@ -36,11 +35,11 @@ if __name__ == "__main__":
 
     model = lstm_with_shop_cate_embedding.get_model(hidden_size=20, x3_shape=(12,1),
                 shop_num=shop_num, cate_num=cate_num, embed_size=2, output_dim=1)
-    model = train.train_model(model, X_train, y_train, X_val, y_val, epochs=200)
+    model = train.train_model(model, X_train, y_train, X_val, y_val, epochs=50)
 
     y_hats = infer.infer_testset(model, X_val, y_val)
 
-    # y_test_invscaled = dataloader.get_invertscaled_values('Marcap', y_test)
-    # y_hats_invscaled = dataloader.get_invertscaled_values('Marcap', y_hats)
+    y_val_invscaled = dataloader.get_invertscaled_values(y_val)
+    y_hats_invscaled = dataloader.get_invertscaled_values(y_hats)
 
-    infer.print_result(y_hats, y_val)
+    infer.print_result(y_hats_invscaled, y_val_invscaled)

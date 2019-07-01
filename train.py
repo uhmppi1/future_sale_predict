@@ -7,7 +7,8 @@ from time import strftime
 def train_model(model, X_train, y_train, X_val, y_val, epochs=200):
     # model = simple_lstm.get_model()
     # model.summary()
-    model.compile(optimizer=Adam(lr=0.0001, clipnorm=1.0), loss='mse', metrics=['mse'])
+    # 20190701 clipnorm 1.->0.01
+    model.compile(optimizer=Adam(lr=0.0001, clipnorm=0.01), loss='mse', metrics=['mse'])
 
     # add call backs
     early_stopper = EarlyStopping(monitor='val_loss', patience=10, verbose=1)
@@ -23,7 +24,7 @@ def train_model(model, X_train, y_train, X_val, y_val, epochs=200):
 
         # fit model
         model.fit(X_train, y_train, epochs=epochs, verbose=1, validation_data=(X_val, y_val),
-                  callbacks=[early_stopper, model_saver])
+                    callbacks=[early_stopper, model_saver])
 
         model.save_weights("checkpoint/%s_%s_final.h5" % (model.name, curtime))
 

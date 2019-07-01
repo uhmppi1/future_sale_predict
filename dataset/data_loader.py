@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import os
 import pickle
+from util.scaler import LogMinMaxScaler
 
 DATASET_RAW_DIR = 'dataset/kaggle_raw/'
 
@@ -22,6 +23,9 @@ class DataLoader():
         cate_dataset_filepath = DATASET_RAW_DIR + 'item_categories.csv'
         self.df_item_category = pd.read_csv(cate_dataset_filepath)
 
+        test_dataset_filepath = 'dataset/kaggle_raw/test.csv.gz'
+        self.df_test = pd.read_csv(test_dataset_filepath)
+
 
     def num_shop(self):
         return len(self.df_shop)
@@ -35,6 +39,10 @@ class DataLoader():
 
     def item2cate(self, item_no):
         return self.df_item.loc[self.df_item.index[self.df_item['item_id'] == item_no][0], 'item_category_id']
+
+    def get_invertscaled_values(self, data):
+        inv_scale_func = lambda x: self.scaler.inv_scale_value(x)
+        return inv_scale_func(data)
 
 
     def load_data(self, x_seq_len=12, train_ratio=0.8, load_pickle=True):
@@ -83,6 +91,22 @@ class DataLoader():
         X2 = np.array([X2 for (X1, X2, X3, y) in dataset])
         X3 = np.array([X3 for (X1, X2, X3, y) in dataset])
         y = np.array([y for (X1, X2, X3, y) in dataset])
+
+
+        # normalize X3, y data here..
+        min_val = np.min([X3.min(), y.min()])
+        max_val = np.max([X3.max(), y.max()])
+        print('min_val :', min_val)
+        print('max_val :', max_val)
+
+        self.scaler = LogMinMaxScaler(min_val, max_val)
+        print('scaler.log_minval:', self.scaler.min_logvalue)
+        print('scaler.log_maxval:', self.scaler.max_logvalue)
+        scale_func = lambda x : self.scaler.scale_value(x)
+        X3 = scale_func(X3)
+        y = scale_func(y)
+
+        print(X3[0])
 
         X1_train = X1[msk]
         X2_train = X2[msk]
